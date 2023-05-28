@@ -1,0 +1,10 @@
+.payment-cards {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .payment-card {
+    width: 300px;
+    margin: 10px;
+  }
+  

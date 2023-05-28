@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import './App.css'; // Import CSS file for styling
 import { auth } from './config/firebase';
 import Login from './Components/login/login';
+import Loader from './Components/Loader/Loader';
 // import Signup from './Components/signup/signup';
 
 const Home = lazy(() => import('./Components/Home/home'));
@@ -12,6 +13,7 @@ const Users = lazy(() => import('./Components/users/users'));
 
 function App() {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Add authentication state change listener
@@ -23,6 +25,9 @@ function App() {
         // User is signed out, set the user state to null
         setUser(null);
       }
+
+      // Set loading state to false once authentication is checked
+      setIsLoading(false);
     });
 
     // Cleanup the listener on unmount
@@ -95,26 +100,29 @@ function App() {
         </ul>
       </nav>
 
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          {!user ? (
-            <>
-              <Route path="/login" element={<Login />} />
-              {/* <Route path="/signup" element={<Signup />} /> */}
-              <Route path="*" element={<Navigate to="/login" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/" element={<Home />} />
-              <Route path="/rooms" element={<Rooms />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/booked" element={<Booked />} />
-              <Route path="*" element={<Navigate to="/"/>} />
-
-            </>
-          )}
-        </Routes>
-      </Suspense>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            {!user ? (
+              <>
+                <Route path="/login" element={<Login />} />
+                {/* <Route path="/signup" element={<Signup />} /> */}
+                <Route path="*" element={<Navigate to="/login" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/" element={<Home />} />
+                <Route path="/rooms" element={<Rooms />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/booked" element={<Booked />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </>
+            )}
+          </Routes>
+        </Suspense>
+      )}
     </BrowserRouter>
   );
 }
